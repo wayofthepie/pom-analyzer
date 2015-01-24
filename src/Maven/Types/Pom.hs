@@ -1,6 +1,3 @@
-{-# LANGUAGE
-    TemplateHaskell
-    #-}
 
 module Maven.Types.Pom (
     Pom (Pom)

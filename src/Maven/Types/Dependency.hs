@@ -1,6 +1,3 @@
-{-# LANGUAGE
-    TemplateHaskell
-    #-}
 
 module Maven.Types.Dependency (
     DependencyManagement (DepMan)
