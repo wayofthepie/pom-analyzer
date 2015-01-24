@@ -2,9 +2,14 @@
     TemplateHaskell
     #-}
 
-module Maven.Types.Dependency where
+module Maven.Types.Dependency (
+    DependencyManagement (DepMan)
+    , Dependency (Dependency)
+    , groupId
+    , artifactId
+    , version
+    ) where
 
-import Control.Lens.TH
 import Data.Text as T
 
 newtype DependencyManagement = DepMan [Dependency] deriving (Eq, Show)
@@ -15,6 +20,6 @@ data Dependency = Dependency
     , _version      :: Maybe T.Text
     } deriving (Eq, Show)
 
-$(makeLenses ''DependencyManagement)
-$(makeLenses ''Dependency)
-
+groupId     = _groupId
+artifactId  = _artifactId
+version     = _version
