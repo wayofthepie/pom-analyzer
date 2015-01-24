@@ -4,6 +4,8 @@ module Maven.Analysis where
 
 import Control.Monad (liftM)
 import Control.Monad.IO.Class (liftIO)
+import Data.Tree
+import Data.Tree.Lens
 import Filesystem.Path
 import Filesystem.Path.CurrentOS
 import System.FilePath.Find
@@ -11,7 +13,7 @@ import Text.XML
 import Text.XML.Cursor
 
 import Maven.Parser.Pom
-import Maven.Types.Pom as P
+import Maven.Types.Pom
 
 import Prelude hiding (readFile, FilePath)
 
@@ -22,11 +24,11 @@ findPomsIn d = liftM (map decodeString) $ find always fp (encodeString d)
     where
         fp = fileName ==? "pom.xml"
 
-parsePoms :: [FilePath] -> [IO P.Pom]
+parsePoms :: [FilePath] -> [IO Pom]
 parsePoms fs = map readAndParse fs
 
 -- Temporary helper function
-readAndParse :: FilePath -> IO P.Pom
+readAndParse :: FilePath -> IO Pom
 readAndParse f = do
     doc <- readFile def f
     let cursor = fromDocument doc

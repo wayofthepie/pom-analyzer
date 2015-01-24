@@ -3,6 +3,7 @@ module Maven.Types.Pom (
     Pom (Pom)
     , DependencyManagement(DepMan)
     , Dependency(..)
+    , Parent(..)
     , groupId
     , artifactId
     , version
@@ -15,32 +16,34 @@ import Data.Text as T
 
 
 data Pom = Pom
-    { _groupId       :: T.Text
-    , _artifactId    :: T.Text
-    , _version       :: T.Text
+    { _groupId      :: Maybe T.Text -- Can be taken from the parent.
+    , _artifactId   :: T.Text
+    , _version      :: Maybe T.Text
+    , _parent       :: Maybe Parent
     , _dependencyManagement :: Maybe DependencyManagement
-    , _dependencies  :: Maybe [Dependency]
+    , _dependencies :: Maybe [Dependency]
     } deriving (Eq, Show)
+
+newtype Parent = Parent Dependency deriving (Eq, Show)
 
 newtype DependencyManagement = DepMan [Dependency] deriving (Eq, Show)
 
 -- It would be better to express version as a Maybe as it can be missing,
 -- currently it will just appear as an empty String
-
-
 data Dependency = Dependency
     -- | groupId
-    T.Text
+    ( Maybe T.Text )
     -- | artifactId
     T.Text
     -- | version
-    T.Text deriving (Eq, Show)
+    ( Maybe T.Text ) deriving (Eq, Show)
+
 
 
 class HasPackageInfo a where
-    groupId     :: a -> T.Text
+    groupId     :: a -> Maybe T.Text
     artifactId  :: a -> T.Text
-    version     :: a -> T.Text
+    version     :: a -> Maybe T.Text
 
 
 instance HasPackageInfo Dependency where
@@ -53,6 +56,7 @@ instance HasPackageInfo Pom where
     groupId    = _groupId
     artifactId = _artifactId
     version    = _version
+
 
 
 dependencyManagement= _dependencyManagement

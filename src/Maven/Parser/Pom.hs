@@ -4,8 +4,11 @@
 
 module Maven.Parser.Pom where
 
+import Control.Lens.At
+import Control.Lens.Fold
 import Control.Monad (liftM, (>=>))
 import Control.Monad.IO.Class (liftIO)
+import Data.Maybe
 import Data.Monoid (mconcat, (<>))
 import qualified Data.Text as T
 import Filesystem.Path
@@ -22,12 +25,13 @@ import Prelude hiding (readFile, FilePath)
 -- | Parse a pom file.
 parsePom :: Cursor -> P.Pom
 parsePom c = do
-    let groupId     = getContent c groupIdTag
+    let groupId     = text2maybe $ getContent c groupIdTag
         artifactId  = getContent c artifactIdTag
-        version     = getContent c versionTag
+        version     = text2maybe $ getContent c versionTag
+        parent      = liftM P.Parent $ ( parseParent c ) ^? ix 0
         dependencyMan   = Just $ P.DepMan $ parseDepMan c
         dependencies    = Just $ parseDeps c
-    P.Pom groupId artifactId version dependencyMan dependencies
+    P.Pom groupId artifactId version parent dependencyMan dependencies
 
 
 -- | Parse dependencyManagement.
@@ -44,19 +48,24 @@ parseDeps c = c $/
 -- | Parse dependency.
 parseDep :: Cursor -> [P.Dependency]
 parseDep c = do
-    let groupId     = getContent c groupIdTag
+    let groupId     = text2maybe $ getContent c groupIdTag
         artifactId  = getContent c artifactIdTag
-        version     = getContent c versionTag
+        version     = text2maybe $ getContent c versionTag
     [P.Dependency groupId artifactId version]
 
 
--- Tags (hardcode the namespace for now ...)
+-- | Parse parent.
+parseParent :: Cursor -> [P.Dependency]
+parseParent c = c $/ element parentTag >=> parseDep
 
+
+-- Tags (hardcode the namespace for now ...)
 modelv4ns   = "http://maven.apache.org/POM/4.0.0"
 buildName e = Name e (Just modelv4ns) Nothing
 groupIdTag      = buildName "groupId"
 artifactIdTag   = buildName "artifactId"
 versionTag      = buildName "version"
+parentTag       = buildName "parent"
 dependencyManagementTag = buildName "dependencyManagement"
 dependenciesTag = buildName "dependencies"
 dependencyTag   = buildName "dependency"
@@ -66,10 +75,8 @@ dependencyTag   = buildName "dependency"
 getContent :: Cursor -> Name -> T.Text
 getContent c t = mconcat $ c $/ element t &/ content
 
-{-
-buildPomRelationship :: [FilePath] -> Tree a
-buildPomRelationship (f:fs) =
--}
-
+text2maybe :: T.Text -> Maybe T.Text
+text2maybe t | t == T.empty = Nothing
+             | otherwise = Just t
 
 
