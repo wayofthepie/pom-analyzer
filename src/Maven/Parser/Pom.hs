@@ -11,8 +11,8 @@ import Control.Monad.IO.Class (liftIO)
 import Data.Maybe
 import Data.Monoid (mconcat, (<>))
 import qualified Data.Text as T
-import Filesystem.Path
-import Filesystem.Path.CurrentOS
+import Filesystem.Path hiding (null)
+import Filesystem.Path.CurrentOS hiding (null)
 import Text.XML
 import Text.XML.Cursor
 
@@ -29,8 +29,8 @@ parsePom c = do
         artifactId  = getContent c artifactIdTag
         version     = text2maybe $ getContent c versionTag
         parent      = liftM P.Parent $ ( parseParent c ) ^? ix 0
-        dependencyMan   = Just $ P.DepMan $ parseDepMan c
-        dependencies    = Just $ parseDeps c
+        dependencyMan   = liftM P.DepMan $ list2maybe . parseDepMan $ c
+        dependencies    = list2maybe . parseDeps $ c
     P.Pom groupId artifactId version parent dependencyMan dependencies
 
 
@@ -41,9 +41,7 @@ parseDepMan c = c $/ element dependencyManagementTag >=> parseDeps
 
 -- | Parse dependencies.
 parseDeps :: Cursor -> [P.Dependency]
-parseDeps c = c $/
-    element dependenciesTag &// element dependencyTag >=> parseDep
-
+parseDeps c = c $/ element dependenciesTag &// element dependencyTag >=> parseDep
 
 -- | Parse dependency.
 parseDep :: Cursor -> [P.Dependency]
@@ -79,4 +77,6 @@ text2maybe :: T.Text -> Maybe T.Text
 text2maybe t | t == T.empty = Nothing
              | otherwise = Just t
 
+list2maybe :: [a] -> Maybe [a]
+list2maybe l = if null l then Nothing else Just l
 

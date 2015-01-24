@@ -21,7 +21,7 @@ data Pom = Pom
     , _version      :: Maybe T.Text
     , _parent       :: Maybe Parent
     , _dependencyManagement :: Maybe DependencyManagement
-    , _dependencies :: Maybe [Dependency]
+    , _dependencies         :: Maybe [Dependency]
     } deriving (Eq, Show)
 
 newtype Parent = Parent Dependency deriving (Eq, Show)
