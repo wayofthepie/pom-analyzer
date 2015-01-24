@@ -2,7 +2,7 @@
     OverloadedStrings
     #-}
 
-module Pom where
+module Maven.Parser.Pom where
 
 import Control.Monad (liftM, (>=>))
 import Control.Monad.IO.Class (liftIO)

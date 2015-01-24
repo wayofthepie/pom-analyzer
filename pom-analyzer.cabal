@@ -17,9 +17,10 @@ cabal-version:          >=1.10
 
 library
   exposed-modules:
+    Maven.Parser.Pom,
     Maven.Types.Pom,
-    Maven.Types.Dependency,
-    Pom
+    Maven.Types.Dependency
+
 
   -- other-modules:
   -- other-extensions:
