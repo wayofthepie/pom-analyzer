@@ -10,21 +10,13 @@ import Data.Monoid (mconcat, (<>))
 import qualified Data.Text as T
 import Filesystem.Path
 import Filesystem.Path.CurrentOS
-import System.FilePath.Find
 import Text.XML
 import Text.XML.Cursor
 
-import qualified Maven.Types.Dependency as D
 import qualified Maven.Types.Pom as P
 
 import Prelude hiding (readFile, FilePath)
 
-
--- | Get the list of pom files living under the given project's directory.
-findPomsIn :: FilePath -> IO [FilePath]
-findPomsIn d = liftM (map decodeString) $ find always fp (encodeString d)
-    where
-        fp = fileName ==? "pom.xml"
 
 
 -- | Parse a pom file.
@@ -33,29 +25,29 @@ parsePom c = do
     let groupId     = getContent c groupIdTag
         artifactId  = getContent c artifactIdTag
         version     = getContent c versionTag
-        dependencyMan   = Just $ D.DepMan $ parseDepMan c
+        dependencyMan   = Just $ P.DepMan $ parseDepMan c
         dependencies    = Just $ parseDeps c
     P.Pom groupId artifactId version dependencyMan dependencies
 
 
 -- | Parse dependencyManagement.
-parseDepMan :: Cursor -> [D.Dependency]
+parseDepMan :: Cursor -> [P.Dependency]
 parseDepMan c = c $/ element dependencyManagementTag >=> parseDeps
 
 
 -- | Parse dependencies.
-parseDeps :: Cursor -> [D.Dependency]
+parseDeps :: Cursor -> [P.Dependency]
 parseDeps c = c $/
     element dependenciesTag &// element dependencyTag >=> parseDep
 
 
 -- | Parse dependency.
-parseDep :: Cursor -> [D.Dependency]
+parseDep :: Cursor -> [P.Dependency]
 parseDep c = do
     let groupId     = getContent c groupIdTag
         artifactId  = getContent c artifactIdTag
-        version     = Just $ getContent c versionTag
-    [D.Dependency groupId artifactId version]
+        version     = getContent c versionTag
+    [P.Dependency groupId artifactId version]
 
 
 -- Tags (hardcode the namespace for now ...)
@@ -73,14 +65,6 @@ dependencyTag   = buildName "dependency"
 -- Helper functions
 getContent :: Cursor -> Name -> T.Text
 getContent c t = mconcat $ c $/ element t &/ content
-
--- Temporary helper function
-test :: FilePath -> IO P.Pom
-test f = do
-    doc <- readFile def f
-    let cursor = fromDocument doc
-    return $ parsePom cursor
-
 
 {-
 buildPomRelationship :: [FilePath] -> Tree a

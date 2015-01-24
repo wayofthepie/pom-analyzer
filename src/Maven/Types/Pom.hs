@@ -1,21 +1,18 @@
 
 module Maven.Types.Pom (
     Pom (Pom)
+    , DependencyManagement(DepMan)
+    , Dependency(..)
     , groupId
     , artifactId
     , version
-    , dependencyManagement
     , dependencies
+    , dependencyManagement
     ) where
 
-import Control.Lens.TH
+
 import Data.Text as T
 
-import Maven.Types.Dependency hiding
-    ( groupId
-    , artifactId
-    , version
-    )
 
 data Pom = Pom
     { _groupId       :: T.Text
@@ -25,10 +22,38 @@ data Pom = Pom
     , _dependencies  :: Maybe [Dependency]
     } deriving (Eq, Show)
 
-groupId     = _groupId
-artifactId  = _artifactId
-version     = _version
+newtype DependencyManagement = DepMan [Dependency] deriving (Eq, Show)
+
+-- It would be better to express version as a Maybe as it can be missing,
+-- currently it will just appear as an empty String
+
+
+data Dependency = Dependency
+    -- | groupId
+    T.Text
+    -- | artifactId
+    T.Text
+    -- | version
+    T.Text deriving (Eq, Show)
+
+
+class HasPackageInfo a where
+    groupId     :: a -> T.Text
+    artifactId  :: a -> T.Text
+    version     :: a -> T.Text
+
+
+instance HasPackageInfo Dependency where
+    groupId (Dependency gid _ _)    = gid
+    artifactId (Dependency _ aid _) = aid
+    version (Dependency _ _ v)      = v
+
+
+instance HasPackageInfo Pom where
+    groupId    = _groupId
+    artifactId = _artifactId
+    version    = _version
+
+
 dependencyManagement= _dependencyManagement
 dependencies        = _dependencies
-
-
