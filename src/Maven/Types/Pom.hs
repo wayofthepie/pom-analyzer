@@ -21,7 +21,8 @@ data Pom = Pom
     , _version      :: Maybe T.Text
     , _parent       :: Maybe Parent
     , _dependencyManagement :: Maybe DependencyManagement
-    , _dependencies         :: Maybe [Dependency]
+    , _dependencies :: Maybe [Dependency]
+    , _modules      :: Maybe [T.Text]
     } deriving (Eq, Show)
 
 newtype Parent = Parent Dependency deriving (Eq, Show)
@@ -56,7 +57,6 @@ instance HasPackageInfo Pom where
     groupId    = _groupId
     artifactId = _artifactId
     version    = _version
-
 
 
 dependencyManagement= _dependencyManagement
