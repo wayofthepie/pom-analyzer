@@ -12,6 +12,7 @@ module Maven.Types.Pom (
     ) where
 
 
+import Data.Map as Map
 import Data.Text as T
 
 
@@ -20,6 +21,7 @@ data Pom = Pom
     , _artifactId   :: T.Text
     , _version      :: Maybe T.Text
     , _parent       :: Maybe Parent
+    , _properties   :: [( T.Text, T.Text )]
     , _dependencyManagement :: Maybe DependencyManagement
     , _dependencies :: Maybe [Dependency]
     , _modules      :: Maybe [T.Text]
@@ -58,7 +60,7 @@ instance HasPackageInfo Pom where
     artifactId = _artifactId
     version    = _version
 
-
+properties          = _properties
 dependencyManagement= _dependencyManagement
 dependencies        = _dependencies
 modules             = _modules
