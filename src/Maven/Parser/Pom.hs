@@ -89,12 +89,6 @@ parseProperties c =
     in  zip keyList valueList
 
 
--- | applyToChildren elementToSearchFor cursor functionToApply
-applyToChildren ::
-    CG.Cursor Node -> Name -> ([CG.Cursor Node] -> [T.Text]) -> [T.Text]
-applyToChildren cn n f = f $ cn $/ element n &/ anyElement
-
-
 -- | Get the name of an xml node.
 getNodeName :: CG.Cursor Node -> [T.Text]
 getNodeName c = [nameLocalName . elementName . getElement . node $ c]
