@@ -4,6 +4,7 @@
 
 module Maven.Parser.Pom where
 
+import Control.Applicative
 import Control.Lens.At
 import Control.Lens.Fold
 import Control.Monad (liftM, (>=>))
@@ -30,8 +31,8 @@ parsePom c = do
         artifactId  = getContent c artifactIdTag
         version     = text2maybe $ getContent c versionTag
         parent      = liftM P.Parent $ ( parseParent c ) ^? ix 0
-        dependencyMan   = liftM P.DepMan $ list2maybe $ parseDepMan c
-        dependencies    = list2maybe $ parseDeps  c
+        dependencyMan = liftM P.DepMan $ list2maybe $ parseDepMan c
+        dependencies  = list2maybe $ parseDeps  c
         modules     = list2maybe $ parseModules c
     P.Pom groupId artifactId version
         parent dependencyMan dependencies modules

@@ -61,3 +61,4 @@ instance HasPackageInfo Pom where
 
 dependencyManagement= _dependencyManagement
 dependencies        = _dependencies
+modules             = _modules
