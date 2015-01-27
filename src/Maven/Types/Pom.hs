@@ -17,14 +17,14 @@ import Data.Text as T
 
 
 data Pom = Pom
-    { _groupId      :: Maybe T.Text -- Can be taken from the parent.
-    , _artifactId   :: T.Text
-    , _version      :: Maybe T.Text
-    , _parent       :: Maybe Parent
-    , _properties   :: [( T.Text, T.Text )]
+    { _groupId              :: Maybe T.Text
+    , _artifactId           :: T.Text
+    , _version              :: Maybe T.Text
+    , _parent               :: Maybe Parent
+    , _properties           :: Map.Map T.Text T.Text
     , _dependencyManagement :: Maybe DependencyManagement
-    , _dependencies :: Maybe [Dependency]
-    , _modules      :: Maybe [T.Text]
+    , _dependencies         :: Maybe [Dependency]
+    , _modules              :: Maybe [T.Text]
     } deriving (Eq, Show)
 
 newtype Parent = Parent Dependency deriving (Eq, Show)

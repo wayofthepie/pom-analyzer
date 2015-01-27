@@ -9,6 +9,7 @@ import Control.Lens.At
 import Control.Lens.Fold
 import Control.Monad (liftM, (>=>))
 import Control.Monad.IO.Class (liftIO)
+import qualified Data.Map as Map
 import Data.Maybe
 import Data.Monoid (mconcat, (<>))
 import qualified Data.Set as Set
@@ -82,11 +83,11 @@ parseModule c = c $/ element moduleTag &/ content
 
 -------------------------------------------------------------------------------
 -- | Parse properties
-parseProperties :: Cursor -> [(T.Text, T.Text)]
+parseProperties :: Cursor -> Map.Map T.Text T.Text
 parseProperties c =
     let keyList = c $/ element propertiesTag &/ anyElement >=> getNodeName
         valueList = c $/ element propertiesTag &/ anyElement &/ content
-    in  zip keyList valueList
+    in  Map.fromList $ zip keyList valueList
 
 
 -- | Get the name of an xml node.
